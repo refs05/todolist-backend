@@ -22,9 +22,21 @@ func (nr *mysqlTodosRepository) Store(ctx context.Context, todosDomain *todos.Do
 
 	result := nr.Conn.Create( &rec)
 	if result.Error != nil {
-		return todos.Domain{}
+		return todos.Domain{}, result.Error
 	}
 
+	return result, nil
+
 	// record, err := nr.Conn.Where("todo.id = ?", todo)
-	return todos.Domain{}, nil
 }
+
+func (nr *mysqlTodosRepository) GetByID(ctx context.Context, todoId int) (todos.Domain, error) {
+	rec := Todo{}
+	err := nr.Conn.Where("todo.id = ?", todoId).First(&rec).Error
+	if err != nil {
+		return todos.Domain{}, err
+	}
+
+	return rec.toDomain(), nil
+}
+

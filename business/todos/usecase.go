@@ -35,23 +35,35 @@ func (tu *todosUsecase) GetTodos(ctx context.Context) ([]Domain, error) {
 		return []Domain{}, err
 	}
 
-	return result, err
+	return result, nil
 }
 
-func (tu *todosUsecase) Update(ctx context.Context, todosDomain *Domain) ([]Domain, error) {
+func (tu *todosUsecase) GetByID(ctx context.Context, todoId int) (Domain, error) {
+	ctx, cancel := context.WithTimeout(ctx, tu.contextTimeout)
+	defer cancel()
+
+	res, err := tu.todosRepository.GetByID(ctx, todoId)
+	if err != nil {
+		return Domain{}, err
+	}
+
+	return res, nil
+}
+
+func (tu *todosUsecase) Update(ctx context.Context, todosDomain *Domain) (*Domain, error) {
 	result, err := tu.todosRepository.Update(ctx, todosDomain)
 	if err != nil {
-		return []Domain{}, err
+		return &Domain{}, err
 	}
 
-	return result, err
+	return &result, nil
 }
 
-func(tu *todosUsecase) Delete(ctx context.Context, todosDomain *Domain) ([]Domain, error) {
+func(tu *todosUsecase) Delete(ctx context.Context, todosDomain *Domain) (*Domain, error) {
 	result, err := tu.todosRepository.Delete(ctx, todosDomain)
 	if err != nil {
-		return []Domain{}, err
+		return &Domain{}, err
 	}
 
-	return result, err
+	return &result, nil
 }
