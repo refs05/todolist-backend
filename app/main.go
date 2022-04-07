@@ -3,10 +3,15 @@ package main
 import (
 	"log"
 	"time"
-	_todosrepo "todo/business/todos"
 
-	"github.com/labstack/echo/middleware"
+	_routes "todo/app/routes"
+	_todosUsecase "todo/business/todos"
+	_todosController "todo/controller/todos"
+	_todosRepo "todo/driver/database/todos"
+	mysql_driver "todo/driver/mysql"
+
 	"github.com/labstack/echo/v4"
+
 	"github.com/spf13/viper"
 	"gorm.io/gorm"
 )
@@ -24,11 +29,11 @@ func init() {
 }
 
 func dbMigrate(db *gorm.DB) {
-	db.AutoMigrate(&_todosrepo.Domain{})
+	db.AutoMigrate(&_todosRepo.Todo{})
 }
 
 func main() {
-	configDB := _dbDriver.ConfigDB{
+	configDB := mysql_driver.ConfigDB{
 		DB_Username: viper.GetString(`database.user`),
 		DB_Password: viper.GetString(`database.pass`),
 		DB_Host:     viper.GetString(`database.host`),
@@ -41,5 +46,16 @@ func main() {
 	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
 
 	e := echo.New()
-	e.Use(middleware.CORS())
+	// e.Use(middleware.CORS())
+
+	todoRepo := _todosRepo.NewTodosRepository(db)
+	todoUsecase := _todosUsecase.NewTodosUsecase(todoRepo, timeoutContext)
+	todoCtrl := _todosController.NewTodosController(todoUsecase)
+
+	routesInit := _routes.ControllerList{
+		TodosController: *todoCtrl,
+	}
+	routesInit.RouteList(e)
+
+	log.Fatal(e.Start(viper.GetString("server.address")))
 }

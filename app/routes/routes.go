@@ -11,7 +11,7 @@ type ControllerList struct {
 }
 
 func (cl *ControllerList) RouteList(e *echo.Echo) {
-	todo := e.Group("todo")
+	todo := e.Group("/todo")
 	todo.GET("/list/", cl.TodosController.GetTodos)
 	todo.POST("/create", cl.TodosController.Create)
 	todo.PUT("/:id", cl.TodosController.Update)

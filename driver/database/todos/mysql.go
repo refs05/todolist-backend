@@ -48,7 +48,7 @@ func (nr *mysqlTodosRepository) GetTodos(ctx context.Context) ([]todos.Domain, e
 
 func (nr *mysqlTodosRepository) GetByID(ctx context.Context, todoId int) (todos.Domain, error) {
 	rec := Todo{}
-	err := nr.Conn.Where("todo.id = ?", todoId).First(&rec).Error
+	err := nr.Conn.Where("todos.id = ?", todoId).First(&rec).Error
 	if err != nil {
 		return todos.Domain{}, err
 	}

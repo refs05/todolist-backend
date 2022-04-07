@@ -11,7 +11,7 @@
     "port": "3306",
     "user": "root",
     "pass": "BavarianRestu2002",
-    "name": "infion"
+    "name": "todoapp"
   },
   "jwt": {
     "secret": "supersecret12345!@#$%",
